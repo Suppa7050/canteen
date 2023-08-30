@@ -75,6 +75,9 @@ const menuRoutes = require("./routes/menuRoutes");
 app.use("/api", menuRoutes);
 const admins = require("./routes/admins");
 app.use('/admins',admins);
+const orderRoutes = require('./routes/orderRoutes');
+app.use('/orders', orderRoutes);
+
 (async () => {
   try {
     await mongoose.connect(dbUrl, options);
