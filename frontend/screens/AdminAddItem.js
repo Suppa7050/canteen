@@ -366,9 +366,10 @@
 
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, Image, TouchableOpacity, Alert } from 'react-native';
+var ImagePicker = require('react-native-image-picker');
+import {launchImageLibrary} from 'react-native-image-picker'
 import axios from 'axios';
-import ImagePicker from 'react-native-image-picker';
 
 const AdminAddItem = () => {
   const [category, setCategory] = useState('');
@@ -378,38 +379,40 @@ const AdminAddItem = () => {
 
   const handleImageUpload = () => {
     ImagePicker.showImagePicker({ title: 'Select Image' }, response => {
-      if (response.uri) {
+      if (!response.didCancel && response.uri) {
         setPic(response.uri);
       }
     });
   };
 
-  const handleSubmit = () => {
-    const newItem = {
-      category,
-      pic, // Here, pic should be the URI of the selected image
-      name,
-      price,
-    };
+  const handleSubmit = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('category', category);
+      formData.append('pic', { uri: pic, name: 'image.jpg', type: 'image/jpeg' });
+      formData.append('name', name);
+      formData.append('price', price);
 
-    const formData = new FormData();
-    formData.append('category', category);
-    formData.append('pic', { uri: pic, name: 'image.jpg', type: 'image/jpeg' });
-    formData.append('name', name);
-    formData.append('price', price);
-
-    axios.post('http://localhost:3031/api/menu', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-      .then(response => {
-        console.log(response.data);
-        // Handle success, maybe navigate back to the MenuScreen
-      })
-      .catch(error => {
-        console.error(error);
+      const response = await axios.post('http://localhost:3031/api/menu', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+
+      if (response.data.message === 'Menu item added successfully') {
+        Alert.alert('Success', 'Menu item added successfully');
+        // Clear form fields and selected image
+        setCategory('');
+        setPic(null);
+        setName('');
+        setPrice('');
+      } else {
+        Alert.alert('Error', 'Failed to add menu item');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'An error occurred while adding the menu item');
+    }
   };
 
   return (

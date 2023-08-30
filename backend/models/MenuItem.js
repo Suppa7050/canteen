@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const menuItemSchema = new mongoose.Schema({
   category: String,
-  pic: Buffer, // Storing the image data as a Buffer
+  pic: String, 
   name: String,
   price: Number,
 });

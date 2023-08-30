@@ -73,7 +73,8 @@ app.use("/users", usersRouter);
 const MenuItem = require("./models/MenuItem");
 const menuRoutes = require("./routes/menuRoutes");
 app.use("/api", menuRoutes);
-
+const admins = require("./routes/admins");
+app.use('/admins',admins);
 (async () => {
   try {
     await mongoose.connect(dbUrl, options);
